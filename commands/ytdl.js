@@ -27,7 +27,7 @@ canThisFileBeSentOverDiscord= (videoname) => {
 // Convert the file size to megabytes (optional)
 	var fileSizeInMegabytes = fileSizeInBytes / (1024*1024);
 	console.log(`name: ${videoname} | filesize: ${fileSizeInMegabytes}`)
-	if (fileSizeInBytes >=8) {
+	if (fileSizeInMegabytes >=8) {
 		console.log("Music too big to be sent through discord. File will remain solely in local storage")
 		return false;
 	} else {
