@@ -19,7 +19,7 @@ Since yt-dlp and ffmpeg are both command-line based, this bot is supposed to hel
 
 
 ## Installation 
-Just your regular DiscordJs bot, set-up a config.json properly with your application token and you are good to go.
+Just your regular DiscordJs bot, set-up a config.json properly with your application token and you are good to go (remember to  have yt-dlp and ffmpeg on the PATH of your system)
     
 ## Main goals:
   * Mess around with ffmpeg and yt-dlp options  to give more detailed user inputs with ease
