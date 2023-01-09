@@ -3,7 +3,7 @@
 
 # <h1>Cogumelista</h1>
 
-<p>Discordjs bot to download and convert music videos.</p>
+<p>Discordjs bot to download and convert music videos using yt-dlp and ffmpeg.</p>
 
 <br>
 <br>
