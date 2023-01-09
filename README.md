@@ -13,6 +13,8 @@ Since yt-dlp and ffmpeg are both command-line based, this bot is supposed to hel
 
 ## Usage so far
     -ytdl [fileType] [url] 
+    
+<img align="center" width="600px" src="https://cdn.discordapp.com/attachments/1041892510269718611/1061930898876018748/downloadSuccess.gif"/>
 
 ## Installation 
 Just your regular DiscordJs bot, set-up a config.json properly with your application token and you are good to go.
