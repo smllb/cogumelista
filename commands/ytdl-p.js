@@ -100,20 +100,27 @@ return playlistData
 async function downloadAudio (videoId, videoTitle, interaction) {
 
 //const mp3String = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o ./music/reggae/"%(title)s.%(ext)s" ${videoId}`
-const mp3String = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o F:/bot/music/"%(title)s.%(ext)s" ${videoId}`
+const mp3String = `yt-dlp -f bestaudio --extract-audio --audio-format vorbis --audio-quality 5 -o F:/bot/music/"%(title)s.%(ext)s" ${videoId}`
 const oggString = `yt-dlp -f bestaudio --extract-audio --audio-format vorbis --audio-quality 5 -o F:/bot/music/"%(title)s.%(ext)s" ${videoId}`
-console.log(`Download started. videoname: ${videoTitle}`);
+
 
 
 const child = exec(mp3String, (err, res) => {
-
+  console.log(`string: ${mp3String} | ${videoTitle}\n`);
   if (err) return console.log(err);
 
 })
 const result = new Promise(resolve => {
 
   child.on('exit', () => {
-    console.log(`Download finished at: ./${videoTitle}.mp3`)
+    console.log(`Download finished at: F:/bot/music/${videoTitle}.ogg`)
+    interaction.channel.send({ 
+        content: `Download finished, uploading file at F:/bot/music/${videoTitle}.ogg`,
+        files: [
+          `F:/bot/music/${videoTitle}.ogg`,
+        ]
+      });
+      
     resolve()
 });
 })
@@ -171,6 +178,7 @@ module.exports = {
             const id = interaction.options.getString('id');
             try {
                 interaction.reply('Download of: ' + id + ' starting, filetype: ' + filetype);
+                await downloadEntirePlaylist(id, interaction)
             } catch (err){ 
 
                 console.log(err)
