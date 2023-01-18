@@ -47,13 +47,11 @@ async function retrieveDataFromQuery(baseURL, pageToken) {
 
     async function downloadAudio (videoId, videoTitle, interaction) {
  
-        const oggString = `yt-dlp -f bestaudio --extract-audio --audio-format vorbis --audio-quality 5 -o F:/bot/music/${videoTitle} ${videoId}`
-        //const oggString = `yt-dlp -f bestaudio --extract-audio --audio-format vorbis --audio-quality 5 -o F:/bot/music/"%(title)s.%(ext)s" ${videoId}`
+        const oggString = `yt-dlp -f bestaudio --extract-audio --audio-format vorbis --audio-quality 5 -o F:/bot/music/"${videoTitle}".ogg ${videoId}`
         
-        
-        
+        console.log(`starting: ${videoTitle}`)
         const child = exec(oggString, (err, res) => {
-          console.log(`string: ${oggString} | ${videoTitle}\n`);
+          console.log(`string: ${oggString}\n`);
           if (err) return console.log(err);
         
         })
@@ -78,56 +76,78 @@ async function retrieveDataFromQuery(baseURL, pageToken) {
 
 
 
-async function retrievePlaylistObject (playlistID) {
+async function downloadPlaylist (playlistID, interaction) {
 
-    //const baseURL = `https://www.googleapis.com/youtube/v3/playlistItems?` +
-    `part=snippet,status` +
-    `&fields=items(status(privacyStatus),snippet(title,resourceId)),nextPageToken` +
-    `&playlistId=${playlistID}&maxResults=50&key=${apiKey}`;
     const baseURL = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,status&fields=items(status(privacyStatus),snippet(title,resourceId)),nextPageToken&playlistId=${playlistID}&maxResults=50&key=${apiKey}`;
 
 
     let query = await retrieveDataFromQuery(baseURL);
-    const playlist = {};
-    playlist.items = query.items;
-    playlist.tokens = [query.nextPageToken];
-    let nextIndex = playlist.tokens.length;
-    playlist.tokens[nextIndex] = 'yeet';
-    nextPageToken = playlist.tokens[0]
-    //console.log(nextPageToken)
+    nextPageToken = query.nextPageToken;
     
-    
-    console.log("test: " + playlist.tokens.length)
-    if (playlist.tokens[0]) {
+    console.log(query.items.length);
+    for (let i=0;i<query.items.length;i++) {
+        await downloadAudio(query.items[i].id, query.items[i].title, interaction)
+    }
+
+    if (query.nextPageToken) {
         console.log(`Token found ${nextPageToken}`)
 
         while (nextPageToken) {
-           // console.log(`Entering with token: ${playlist.tokens[nextIndex]}`)
-            let nextQuery = await retrieveDataFromQuery(baseURL, nextPageToken);
-            playlist.tokens[nextIndex] = nextQuery.nextPageToken
-            nextPageToken = playlist.tokens[nextIndex]
-            //console.log(nextPageToken)
-            console.log(`Leaving with token: ${nextQuery.nextPageToken}`)
-            //console.log(nextQuery)
+
+            query = await retrieveDataFromQuery(baseURL, nextPageToken);
+            nextPageToken = query.nextPageToken;
+
+            await query.items.forEach((item, i) => {
+                downloadAudio(query.items[i].id, query.items[i].title, interaction)
+            })
+
+            console.log(`Leaving with token: ${query.nextPageToken}`)
             
         }
+
     } else {
-       console.log(`No token found ${playlist.tokens[0]}`)
-        // downloadVideoAndConvert()
+       console.log(`No token found`)
+       return
 
     }
 
 }
 
-retrievePlaylistObject('PLpuDUpB0osJmZQ0a3n6imXirSu0QAZIqF')
+
 
 
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('fetch')
-		.setDescription('lorem ipsum xd'),
-	async execute(interaction) {
-		interaction.reply("wip!")
-	},
-};
+
+    data: new SlashCommandBuilder()	
+    .setName('ytp')
+    .setDescription('Download, convert and upload audio files from youtube videos or playlists.')
+    .addStringOption(option =>
+        option.setName('type')
+            .setDescription('Choose between mp3 or ogg.')
+            .setRequired(true)
+            .addChoices(
+                { name: 'playlist', value: 'playlist' },
+                { name: 'downloadmusic', value: 'video' },))
+    .addStringOption(option =>
+        option.setName('id')
+            .setDescription('Video/Playlist ID')
+            .setRequired(true)),
+
+
+        async execute(interaction)  {
+
+            const type = interaction.options.getString('type');
+            const id = interaction.options.getString('id');
+            try {
+                interaction.reply('Download of: ' + id + ' starting, type of operation: ' + type);
+                await downloadPlaylist(id, interaction)
+            } catch (err){ 
+
+                console.log(err)
+            
+            }
+
+            }
+
+}
