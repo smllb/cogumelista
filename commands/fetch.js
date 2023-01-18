@@ -7,7 +7,9 @@ const util = require('util');
 const { DataResolver } = require('discord.js');
 const { SlashCommandBuilder } = require('discord.js');
 const path = require('path');
+const { url } = require('node:inspector');
 
+let reg = /\||\\|\/|:|\\?|"|<|>/ig;
 
 buildQueryUrl = (baseURL, pageToken) => {
     const buildUrl = {
@@ -22,7 +24,35 @@ buildQueryUrl = (baseURL, pageToken) => {
     return buildUrl.base;
     
 }
+async function downloadSingleVideo(id, interaction) {
+  const baseURL = `https://www.googleapis.com/youtube/v3/videos?part=snippet, status&field=snippet(title,thumbnails)&maxResults=50&id=${id}&key=${apiKey}`
+  let videoData = await querySingleVideo(baseURL)
+  //interaction.channel.send(`Download of ${videoData.items[0].title} about to start. ${videoData.items[0].thumb}`)
+  //interaction.channel.send( `Download of ${videoData.items[0].title} about to start. `,);
+  interaction.channel.send( `${videoData.items[0].thumb}`,);
+  await downloadAudio(videoData.items[0].id, videoData.items[0].title, interaction)
+  
+}
 
+async function querySingleVideo(url) {
+
+    return fetch(`${url}`)
+        .then(console.log(`sFetching: ${url}}`))
+        .then(response => response.json())
+        .then(data =>  {
+             const items = data.items
+                .filter(item => item.status.privacyStatus === 'public')
+                .map((item, i)=> ({
+                    id: item.id,
+                    title: item.snippet.title.replace(reg, ""),
+                    thumb: item.snippet.thumbnails.medium.url
+                }))   
+                return {
+                    items: items
+                }
+        })
+
+} 
 async function retrieveDataFromQuery(baseURL, pageToken) {
     let reg = /\||\\|\/|:|\\?|"|<|>/ig;
     
@@ -60,7 +90,7 @@ async function retrieveDataFromQuery(baseURL, pageToken) {
           child.on('exit', () => {
             console.log(`Download finished at: F:/bot/music/${videoTitle}.ogg`)
             interaction.channel.send({ 
-                content: `Download finished, uploading file at F:/bot/music/${videoTitle}.ogg`,
+                //content: `Download finished, uploading file at F:/bot/music/${videoTitle}.ogg`,
                 files: [
                   `F:/bot/music/${videoTitle}.ogg`,
                 ]
@@ -136,17 +166,34 @@ module.exports = {
 
 
         async execute(interaction)  {
-
+            await interaction.deferReply()
             const type = interaction.options.getString('type');
             const id = interaction.options.getString('id');
-            try {
-                interaction.reply('Download of: ' + id + ' starting, type of operation: ' + type);
-                await downloadPlaylist(id, interaction)
-            } catch (err){ 
+            if (type === 'playlist') {
 
-                console.log(err)
-            
+                try {
+                    interaction.editReply('Download of: ' + id + ' starting, type of operation: ' + type);
+                    await downloadPlaylist(id, interaction)
+                } catch (err){ 
+    
+                    console.log(err)
+                
+                }
+
+
+            } else if (type === 'video') {
+                try {
+                    interaction.editReply('Download of: ' + id + ' starting');
+                    await downloadSingleVideo(id, interaction)    
+
+                } catch (err) {
+
+                    console.log(err)
+
+                }
+
             }
+            
 
             }
 
