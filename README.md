@@ -1,12 +1,6 @@
-
-<img align="right" width="200" src="https://cdn.discordapp.com/attachments/1041892510269718611/1061923729430552627/2761921864.png"/>
-
 # <h1>Cogumelista</h1>
 
 <p>Discordjs bot to download and convert music videos using yt-dlp and ffmpeg.</p>
-
-<br>
-<br>
 
 ## About
 Since yt-dlp and ffmpeg are both command-line based, this bot is supposed to help the usage of both programs along with the Discord GUI.
@@ -15,7 +9,7 @@ Since yt-dlp and ffmpeg are both command-line based, this bot is supposed to hel
     -ytdl [fileType] [url] 
     
  
-<h1 align="center"><img width="600px" src="https://cdn.discordapp.com/attachments/1041892510269718611/1061930898876018748/downloadSuccess.gif"/></h1>
+<h1 align="center"><img width="600px" src="https://cdn.discordapp.com/attachments/1041892510269718611/1061930898876018748/downloadSuccess.gif?ex=66394378&is=6637f1f8&hm=b991278d363e5b6783c5c0356774664f91de9242c632510537c9f45d9fa1506f"/></h1>
 
 
 ## Installation 
